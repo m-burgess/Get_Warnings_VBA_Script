@@ -1,0 +1,69 @@
+Option Explicit
+Global redCells As New ArrayList
+Global yellowCells As New ArrayList
+Global redNames As New ArrayList
+Global yellowNames As New ArrayList
+Global name As Object
+Global value As Object
+Global index As Integer
+
+
+Sub GetWarnings_Click()
+
+Call IterateCells
+Call WriteToNewWorksheet
+
+End Sub
+Function WriteToNewWorksheet()
+ 
+    Sheets.Add.name = "Warning_Report"
+    
+    Range("A1").value = "ActionNeeded"
+    Range("A2").value = "Name"
+    Range("B2").value = "Date"
+    
+    Range("C1").value = "Warning"
+    Range("C2").value = "Name"
+    Range("D2").value = "Date"
+    
+    ActiveSheet.Range("A3").Resize(redNames.Count, 1).value = WorksheetFunction.Transpose(redNames.toArray)
+    ActiveSheet.Range("B3").Resize(redCells.Count, 1).value = WorksheetFunction.Transpose(redCells.toArray)
+    ActiveSheet.Range("C3").Resize(yellowNames.Count, 1).value = WorksheetFunction.Transpose(yellowNames.toArray)
+    ActiveSheet.Range("D3").Resize(yellowCells.Count, 1).value = WorksheetFunction.Transpose(yellowCells.toArray)
+    
+    redNames.Clear
+    redCells.Clear
+    yellowNames.Clear
+    yellowCells.Clear
+End Function
+
+
+Function IterateCells()
+
+Dim Cell As Range
+
+   For Each Cell In ActiveSheet.UsedRange.Cells
+      Call CheckForRedAndYellow(Cell)
+   Next
+
+End Function
+
+Function CheckForRedAndYellow(FCell As Range)
+Dim getRGB1 As String
+Dim xColor As String
+    xColor = CStr(FCell.Interior.Color)
+    xColor = Right("000000" & Hex(xColor), 6)
+    getRGB1 = Right(xColor, 2) & Mid(xColor, 3, 2) & Left(xColor, 2)
+
+If getRGB1 = "FF0000" Then
+redCells.Add FCell.value
+
+Dim r As Long
+    redNames.Add Range("B" & FCell.Row).value
+
+ElseIf getRGB1 = "FFFF00" Then
+yellowCells.Add FCell.value
+    yellowNames.Add Range("B" & FCell.Row).value
+End If
+
+End Function
