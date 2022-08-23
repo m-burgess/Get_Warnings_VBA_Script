@@ -1,0 +1,79 @@
+Option Explicit
+Global fieldTagList() As String
+Global ruleNameList() As String
+
+
+Sub CompareButton_Click()
+
+Call GetFieldTags
+Call GetRuleNames
+Call CompareTagsAndRules
+Call DeleteBlankRows
+
+
+End Sub
+
+
+Function GetFieldTags()
+    Dim index As Long
+    Dim totalRows As Long
+    Dim tag As String
+    
+    
+    totalRows = Rows(Rows.Count).End(xlUp).Row
+    
+    ReDim fieldTagList(1 To totalRows)
+    
+    For index = 2 To totalRows
+        fieldTagList(index) = Cells(index, 6).Value
+    Next
+        
+    MsgBox "Loaded " & UBound(fieldTagList) & " fieldtags!"
+    
+End Function
+
+Function GetRuleNames()
+    Dim index As Long
+    Dim totalRows As Long
+    Dim rule As String
+    
+    
+    totalRows = Rows(Rows.Count).End(xlUp).Row
+    
+    ReDim ruleNameList(1 To totalRows)
+    
+    For index = 2 To totalRows
+        ruleNameList(index) = Cells(index, 10).Value
+    Next
+        
+    MsgBox "Loaded " & UBound(ruleNameList) & " rule names!"
+    
+End Function
+
+Function CompareTagsAndRules()
+Dim index As Long
+Dim sheetIndex As Long
+
+sheetIndex = 1
+
+Sheets.Add.Name = "TagRuleNameComparison_Report"
+
+For index = 2 To UBound(fieldTagList) - LBound(fieldTagList) + 1
+    If fieldTagList(index) <> ruleNameList(index) Then
+        Cells(index - sheetIndex, 1).Value = fieldTagList(index)
+        Cells(index - sheetIndex, 2).Value = ruleNameList(index)
+    End If
+Next
+
+End Function
+
+Function DeleteBlankRows()
+Dim index As Long
+
+     For index = 1 To UBound(fieldTagList) - LBound(fieldTagList) + 1
+        If Cells(index, 1).Value = "" Then
+            Selection.Rows(index).EntireRow.Delete Shift:=xlUp
+    End If
+Next index
+   
+End Function
